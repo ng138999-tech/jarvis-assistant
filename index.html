@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#050b18">
+<title>JARVIS • Voice Interface v0.2</title>
+<style>
+:root{color-scheme:dark;--cyan:#5de7ff;--blue:#428bff;--muted:#91a9c8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 35%,#102d50 0,#071326 42%,#030711 100%);color:#e9f8ff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;display:grid;place-items:center;padding:22px}
+main{width:min(100%,520px);text-align:center}
+.top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:11px;letter-spacing:1.5px;gap:8px}
+.pulse{width:7px;height:7px;border-radius:50%;background:#64ffbd;display:inline-block;box-shadow:0 0 12px #64ffbd;margin-right:7px}
+h1{font-size:clamp(27px,7vw,42px);letter-spacing:8px;margin:27px 0 4px;font-weight:500;text-shadow:0 0 22px #4ccfff}
+.sub{color:var(--cyan);font-size:10px;letter-spacing:3px}
+.core-wrap{height:218px;display:grid;place-items:center;position:relative;margin:8px auto}
+.core{width:148px;height:148px;border-radius:50%;border:1px solid #65eaff;display:grid;place-items:center;position:relative;box-shadow:0 0 24px #1ba8ff66,inset 0 0 28px #1ba8ff33;animation:breathe 3s ease-in-out infinite}
+.core:before,.core:after{content:"";position:absolute;border:1px solid #398bff88;border-radius:50%;inset:-18px;animation:spin 14s linear infinite}
+.core:after{inset:-32px;border-style:dashed;animation:spin 24s linear infinite reverse}
+.inner{width:96px;height:96px;border-radius:50%;background:radial-gradient(circle,#5de7ff55,#123b68 55%,#071326 75%);display:grid;place-items:center;color:#c9faff;font-size:29px;box-shadow:0 0 35px #3acfff77}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes breathe{50%{box-shadow:0 0 42px #1ba8ff99,inset 0 0 38px #1ba8ff55;transform:scale(1.025)}}
+.time{font-size:clamp(34px,10vw,52px);font-weight:300;letter-spacing:3px}
+.date{color:var(--muted);font-size:13px;margin-top:3px}
+.greet{font-size:19px;margin:19px 0 4px}.hint{color:var(--muted);font-size:12px}
+.panel{margin-top:22px;border:1px solid #3e9ec855;background:#07182dcc;border-radius:16px;padding:16px;text-align:left}
+.panel-head{color:var(--cyan);font-size:10px;letter-spacing:2px;margin-bottom:10px}
+.status{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:8px 0;border-top:1px solid #24425d88}
+.status span:last-child{color:#a7c4dc;text-align:right}
+.controls{display:flex;gap:10px;margin-top:15px}
+button{flex:1;border:1px solid #51dfff88;background:#0b3152;color:#eafaff;padding:13px 10px;border-radius:12px;font-size:14px;font-weight:600}
+button:disabled{opacity:.5}
+#mic.listening{background:#6a1930;border-color:#ff7294;box-shadow:0 0 18px #ff386655}
+#heard{min-height:42px;margin-top:13px;color:#c8eaff;font-size:13px;line-height:1.5}
+.note{font-size:11px;color:#8da6c3;line-height:1.5;margin-top:12px}
+footer{margin-top:17px;color:#718ba8;font-size:10px;line-height:1.6}
+</style>
+</head>
+<body>
+<main>
+ <div class="top"><span><i class="pulse"></i>SYSTEM ONLINE</span><span>VOICE INTERFACE • v0.4</span></div>
+ <h1>J.A.R.V.I.S.</h1><div class="sub">PERSONAL ASSISTANT INTERFACE</div>
+ <div class="core-wrap"><div class="core"><div class="inner">✦</div></div></div>
+ <div class="time" id="clock">--:--:--</div><div class="date" id="date">Loading date…</div>
+ <div class="greet" id="greeting">Welcome, Nova.</div><div class="hint">Your voice interface prototype is ready.</div>
+ <section class="panel">
+  <div class="panel-head">VOICE CONSOLE</div>
+  <div class="status"><span>Microphone</span><span id="micstatus">Not started</span></div>
+  <div class="status"><span>Speech output</span><span id="speakstatus">Available in browser</span></div>
+  <div class="controls">
+   <button id="mic">🎙 Tap to speak</button>
+   <button id="say">🔊 Test voice</button>
+  </div>
+  <div id="heard" aria-live="polite">Tap the microphone and allow permission when Chrome asks.</div>
+  <div class="note">Try: “Hello JARVIS”, “What time is it?”, or “Explain photosynthesis”. Voice replies in this panel are still simple demos. Use the Open AI Brain button for ChatGPT.</div>
+ </section>
+ <section class="panel">
+  <div class="panel-head">AI BRAIN ACCESS</div>
+  <div class="status"><span>AI provider</span><span>ChatGPT</span></div>
+  <div class="status"><span>Connection</span><span>Opens separately</span></div>
+  <button id="brain" type="button" style="width:100%;margin-top:14px;background:linear-gradient(100deg,#075b8a,#123b75);border-color:#65eaff;box-shadow:0 0 18px #1ba8ff33">🧠 Open AI Brain — ChatGPT</button>
+  <div class="note">This opens ChatGPT in the app or browser. Your JARVIS dashboard is not yet directly connected to ChatGPT, so conversations and answers happen there.</div>
+ </section>
+ <section class="panel">
+  <div class="panel-head">SYSTEM OVERVIEW</div>
+  <div class="status"><span>Interface</span><span>Online</span></div>
+  <div class="status"><span>Study modules</span><span>Physics • Chemistry • Maths</span></div>
+  <div class="status"><span>AI brain</span><span>ChatGPT shortcut added</span></div>
+  <div class="status"><span>Wake word</span><span>Not enabled</span></div>
+ </section>
+ <footer>Voice recognition depends on browser support and internet availability. The microphone starts only when you tap it; this page does not listen continuously or control your phone.</footer>
+
+ <section class="panel">
+  <div class="panel-head">SAFE VOICE COMMANDS</div>
+  <div class="note">Tap the microphone, then try: “open ChatGPT”, “what time is it”, “help”, or “stop speaking”. This page listens only after you tap the microphone.</div>
+  <div class="status"><span>Wake word</span><span>Not active — tap to speak</span></div>
+  <div class="status"><span>Phone controls</span><span>Not enabled</span></div>
+ </section>
+
+</main>
+<script>
+function update(){
+ const now=new Date();
+ document.getElementById('clock').textContent=now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+ document.getElementById('date').textContent=now.toLocaleDateString([], {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+ const h=now.getHours();
+ document.getElementById('greeting').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', Nova.';
+}
+update();setInterval(update,1000);
+const mic=document.getElementById('mic'), say=document.getElementById('say'), heard=document.getElementById('heard');
+document.getElementById('brain').addEventListener('click',()=>{
+ window.location.href='https://chatgpt.com/';
+});
+const micstatus=document.getElementById('micstatus');
+function speak(text){
+ if(!('speechSynthesis' in window)){heard.textContent=text+' (Speech output is not supported in this browser.)';return;}
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(text);u.lang='en-IN';u.rate=0.96;
+ speechSynthesis.speak(u);
+}
+say.addEventListener('click',()=>speak('Hello Nova. JARVIS voice test is working.'));
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(!SR){
+ mic.disabled=true;mic.textContent='Microphone unavailable';
+ micstatus.textContent='Not supported';
+ heard.textContent='Speech recognition is not available in this browser. Try an updated Chrome browser.';
+}else{
+ const recognition=new SR();recognition.lang='en-IN';recognition.interimResults=false;recognition.maxAlternatives=1;
+ mic.addEventListener('click',()=>{
+  try{heard.textContent='Listening…';micstatus.textContent='Listening';mic.classList.add('listening');recognition.start();}catch(e){heard.textContent='Please wait a moment, then tap the microphone again.';}
+ });
+ recognition.onresult=(event)=>{
+  const phrase=event.results[0][0].transcript;
+  heard.textContent='You said: “'+phrase+'”';
+  if(runJarvisCommand(phrase)) return;
+  const p=phrase.toLowerCase();let reply;
+  if(p.includes('time')) reply='The time is '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+'.';
+  else if(p.includes('hello')||p.includes('hi')) reply='Hello Nova. JARVIS voice input is connected for this demo.';
+  else if(p.includes('photosynthesis')) reply='Photosynthesis is the process by which green plants use light energy to convert carbon dioxide and water into glucose and oxygen.';
+  else reply='I heard you say: '+phrase+'. My full AI brain is the next stage of this project.';
+  speak(reply);
+ };
+ recognition.onerror=(event)=>{heard.textContent='Microphone issue: '+event.error+'. Check Chrome microphone permission and try again.';};
+ recognition.onend=()=>{micstatus.textContent='Not listening';mic.classList.remove('listening');};
+}
+
+function runJarvisCommand(rawText){
+ const q=(rawText||'').toLowerCase().trim();
+ if(!q) return false;
+ if(q.includes('open chatgpt') || q.includes('open ai brain') || q.includes('chat gpt')){
+   heard.textContent='Opening ChatGPT…';
+   window.location.href='https://chatgpt.com/';
+   return true;
+ }
+ if(q.includes('what time') || q==='time' || q.includes('current time')){
+   const now=new Date();
+   const answer='The time is '+now.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+   heard.textContent=answer;
+   sayText(answer);
+   return true;
+ }
+ if(q==='help' || q.includes('what can you do')){
+   const answer='Try saying open ChatGPT, what time is it, or stop speaking. I only listen after you tap the microphone.';
+   heard.textContent=answer;
+   sayText(answer);
+   return true;
+ }
+ if(q.includes('stop speaking') || q==='stop'){
+   if('speechSynthesis' in window) window.speechSynthesis.cancel();
+   heard.textContent='Speech stopped.';
+   return true;
+ }
+ return false;
+}
+function sayText(text){
+ if(!('speechSynthesis' in window)) return;
+ window.speechSynthesis.cancel();
+ const utterance=new SpeechSynthesisUtterance(text);
+ utterance.lang='en-IN';
+ window.speechSynthesis.speak(utterance);
+}
+
+</script>
+</body></html>
